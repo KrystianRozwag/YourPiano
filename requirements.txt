@@ -1,0 +1,25 @@
+/piano_diary_app
+    /venv (virtual environment directory)
+    /app
+        __init__.py
+        main.py (entry point of the application)
+        /uix (custom user interface elements)
+            __init__.py
+            sheet_music_widget.py (custom widget for sheet music rendering)
+            piano_keyboard_widget.py (custom widget for piano keyboard)
+        /core (core functionality)
+            __init__.py
+            midi_handler.py (handles MIDI input and output)
+            audio_handler.py (handles audio recording and playback)
+            sheet_music_parser.py (parses and manages sheet music data)
+        /assets (static files like images, sounds, etc.)
+            /images
+            /sounds
+        /utils (helper functions and utilities)
+            __init__.py
+            utilities.py
+    /libs (external libraries not installed via pip)
+    /docs (documentation for the project)
+    /tests (unit tests and integration tests)
+    requirements.txt (list of dependencies to install)
+    README.md (project overview and setup instructions)

@@ -1,0 +1,2 @@
+class KeyboardWidget(App):
+    pass

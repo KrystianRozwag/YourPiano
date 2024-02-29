@@ -1,11 +1,13 @@
-
 import time
 import fluidsynth
 
 fs = fluidsynth.Synth()
 fs.start()
+## Your installation of FluidSynth may require a different driver.
+## Use something like:
+# fs.start(driver="pulseaudio")
 
-sfid = fs.sfload("E:\\piano_project\\app\\core\\example.sf2")
+sfid = fs.sfload("example.sf2")
 fs.program_select(0, sfid, 0, 0)
 
 fs.noteon(0, 60, 30)

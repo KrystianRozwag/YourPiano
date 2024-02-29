@@ -1,3 +1,4 @@
+from uix import TunerScreen, SettingsScreen, SheetsScreen, CalendarScreen
 from functools import partial
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
@@ -6,12 +7,17 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
 from kivy.uix.anchorlayout import AnchorLayout
-#from uix.piano_keyboard_widget import KeyboardWidget
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.graphics import Color, Rectangle
+from kivy.uix.boxlayout import BoxLayout
 
 class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
+        with self.canvas.before:
+            Color(1, 0, 0, 1)  # Red color
+            self.rect = Rectangle(size=self.size, pos=self.pos)
+        self.bind(size=self._update_rect, pos=self._update_rect)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='bottom')
         layout = BoxLayout(orientation='horizontal', size_hint=(None, None), padding=10, spacing=10)
 
@@ -39,8 +45,6 @@ class MainScreen(Screen):
         anchor_layout.add_widget(layout)
 
         self.add_widget(anchor_layout)
-    
-
 
     def change_to_settings(self, *args):
         self.manager.current = 'settings'
@@ -54,17 +58,9 @@ class MainScreen(Screen):
     def change_to_sheets(self, *args):
         self.manager.current = 'sheets'
 
-class CalendarScreen(Screen):
-    pass
-
-class SheetsScreen(Screen):
-    pass
-
-class TunerScreen(Screen):
-    pass
-
-class SettingsScreen(Screen):
-    pass
+    def _update_rect(self, instance, value):
+        self.rect.size = instance.size
+        self.rect.pos = instance.pos
 
 
 class ScreensManager(ScreenManager):
@@ -78,8 +74,6 @@ class PianoDiaryApp(App):
             sm.add_widget(widget)
         return sm
         
-
-    
 
 if __name__ == '__main__':
     PianoDiaryApp().run()

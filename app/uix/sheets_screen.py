@@ -1,31 +1,20 @@
-from functools import partial
-from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
-from kivy.uix.widget import Widget
-from kivy.uix.anchorlayout import AnchorLayout
-#from uix.piano_keyboard_widget import KeyboardWidget
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.graphics import Color, Rectangle
-from kivy.uix.boxlayout import BoxLayout
-
-class SheetsScreen(Screen):
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.floatlayout import MDFloatLayout
+from kivymd.uix.button import MDButton, MDButtonIcon, MDButtonText
+from kivymd.uix.screen import MDScreen
+from kivymd.app import MDApp
+from kivymd.uix.anchorlayout import MDAnchorLayout
+from kivymd.uix.screenmanager import MDScreenManager
+class SheetsScreen(MDScreen):
     def __init__(self, **kwargs):
         super(SheetsScreen, self).__init__(**kwargs)
-        anchor_layout = AnchorLayout(anchor_x='center', anchor_y='bottom')
-        back_btn = Button(text="Menu", 
-                        background_color=(1,0,0,1),
-                        size_hint=(None, None), size=(100, 50))
+        anchor_layout = MDAnchorLayout(anchor_x='center', anchor_y='bottom')
+        back_btn = MDButton(MDButtonText(text="Menu"), 
+                     size_hint=(None, None), size=(100, 50))
         
         back_btn.bind(on_press=self.back_to_menu)
         anchor_layout.add_widget(back_btn)
         self.add_widget(anchor_layout)
-
-
-
-
 
     def back_to_menu(self, *args):
         self.manager.current = 'main'

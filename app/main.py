@@ -55,7 +55,6 @@ class ScreensManager(MDScreenManager):
 
 class PianoDiaryApp(MDApp):
     def build(self):
-        self.current_date = datetime.now().strftime('%Y-%m-%d')
         sm = ScreensManager()
         screens = [MainScreen(name='main'),CalendarScreen(name='calendar'),SheetsScreen(name='sheets'),TunerScreen(name='tuner'), SettingsScreen(name='settings')]
         for widget in screens:

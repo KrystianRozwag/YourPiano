@@ -24,7 +24,7 @@ class MainScreen(MDScreen):
                      size_hint=(None, None))
         sheets_btn = MDButton(MDButtonText(text="Sheets"),
                      size_hint=(None, None))
-        
+
         buttons = {'settings':settings_btn, 'calendar':calendar_btn, 'tuner':tuner_btn,'sheets':sheets_btn}
         for key,value in buttons.items():
             layout.add_widget(value)

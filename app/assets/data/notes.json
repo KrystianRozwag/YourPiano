@@ -1,17 +1,22 @@
 {
     "notes": [
-      {
-        "date": "2024-03-02",
-        "title": "Meeting with Team",
-        "description": "Discuss project milestones and deadlines.",
-        "filePath": "/documents/meeting_notes.txt"
-      },
-      {
-        "date": "2024-03-03",
-        "title": "Workshop Summary",
-        "description": "Summary of the key points from the workshop on data analysis.",
-        "filePath": "/documents/workshop_summary.pdf"
-      }
-
+        {
+            "date": "02/03/2024",
+            "title": "Meeting with Team",
+            "description": "Discuss project milestones and deadlines.",
+            "filePath": "/documents/meeting_notes.txt"
+        },
+        {
+            "date": "03/03/2024",
+            "title": "Workshop Summary",
+            "description": "Summary of the key points from the workshop on data analysis.",
+            "filePath": "/documents/workshop_summary.pdf"
+        },
+        {
+            "date": "08/03/2024",
+            "title": "dupa",
+            "description": "dupa",
+            "filePath": "C:/Users/krystian/Downloads/O3pGlWlxObDOJ1MeUyMTihPQG9yyZSI4.mp4"
+        }
     ]
-  }
+}

@@ -1,5 +1,23 @@
 import json
-
+class DataReader:
+    def __init__(self):
+        self.notes_file_path = 'app\\assets\\data\\notes.json'
+    def load_data(self, topic_field, text_input, date):
+        data = self._read_notes()
+        notes = data['notes']
+        for note in notes:
+            if note['date'] == date:
+                topic_field.text = note['title']
+                text_input.text = note['description']
+        pass
+    def _read_notes(self):
+        try:
+            with open(self.notes_file_path, 'r') as json_file:
+                return json.load(json_file)
+        except FileNotFoundError:
+            raise Exception(f"File {self.notes_file_path} not found.")
+        except json.JSONDecodeError:
+            raise Exception("Error decoding JSON from the file.")
 class DataSender:
     def __init__(self):
         self.notes_file_path = 'app\\assets\\data\\notes.json'
@@ -31,7 +49,6 @@ class DataSender:
                 elif title != note['title'] or description != note['description']:
                     note['title'] = title
                     note['description'] = description
-                    #notes.remove(note)
                     return True
         return False
 

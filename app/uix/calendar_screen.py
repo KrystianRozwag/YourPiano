@@ -6,12 +6,11 @@ from kivymd.uix.anchorlayout import MDAnchorLayout
 from kivymd.uix.label import MDLabel 
 from kivymd.uix.scrollview import MDScrollView
 from kivy.uix.textinput import TextInput
-from kivy.core.window import Window
-from kivy.lang import Builder
 from datetime import datetime
 from uix.calendar_widget import CalendarWidget
 from tkinter import filedialog
 from core import DataSender
+
 class CalendarScreen(MDScreen):
 
     def __init__(self, **kwargs):
@@ -24,11 +23,10 @@ class CalendarScreen(MDScreen):
 
         anchor_layout = MDAnchorLayout(anchor_x='center', anchor_y='bottom')
         layout = MDBoxLayout(orientation='vertical', spacing=20, padding=20,size_hint=(0.5, None))
-        layout_calendar =  MDAnchorLayout(anchor_x='center', anchor_y='top', padding=10)
         anchor_layout_btns = MDAnchorLayout(anchor_x='right', anchor_y='bottom', padding=10)
         scroll_view = MDScrollView(size_hint=(1, None), height=200)
 
-        data_sender = DataSender()
+
         # Create a TextInput for multi-line text input
         text_input = TextInput(
             size_hint_y=1,
@@ -41,7 +39,8 @@ class CalendarScreen(MDScreen):
         topic_field =  MDTextField(
             MDTextFieldHintText(text="Topic"),
             pos_hint={'center_x': 0.5, 'center_y': 0.4},
-            size_hint_x=0.5
+            size_hint_x=0.5,
+            required = True
         )
         #description_field =  MDTextField(
          #   MDTextFieldHintText(text="Description"),
@@ -64,6 +63,7 @@ class CalendarScreen(MDScreen):
 
         back_btn = MDButton(MDButtonText(text="Menu"), 
                     size_hint=(None, None), size=(100, 50))
+        
         self.current_date = datetime.now().strftime('%d/%m/%Y')
         self.calendar_field = MDTextField(
             MDTextFieldHelperText(text="DD/MM/YYYY",mode="persistent"),
@@ -73,12 +73,13 @@ class CalendarScreen(MDScreen):
             id="calendar_field",
             validator="date",
             mode="outlined",
-            size_hint=(1, None), height='48dp'
+            size_hint=(1, None), 
+            height='48dp',
         )
-        calendar_widget = CalendarWidget(self, self.calendar_field)
+        calendar_widget = CalendarWidget(self, self.calendar_field, topic_field, text_input)
         self.add_widget(calendar_widget)
-        self.add_widget(layout_calendar)
         back_btn.bind(on_press=self._back_to_menu)
+        data_sender = DataSender()
         load_file_btn.bind(on_press=lambda *args: data_sender.send_data(self.calendar_field, topic_field, text_input, self.file_path) )
         choose_file_btn.bind(on_release=lambda *args: self._load_file(path_label))
 

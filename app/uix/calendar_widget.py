@@ -19,7 +19,7 @@ class CalendarWidget(MDWidget):
 
 
 
-    def on_ok(self, instance_date_picker, field, topic_field, text_input):
+    def _on_ok(self, instance_date_picker, field, topic_field, text_input):
         date = instance_date_picker.get_date()[0]
         date_str = str(date).split("-")
         today = datetime.now()
@@ -40,7 +40,7 @@ class CalendarWidget(MDWidget):
 
 
 
-    def on_cancel(self, instance_date_picker):
+    def _on_cancel(self, instance_date_picker):
         instance_date_picker.dismiss()
         self.number_of_docked_dates -= 1
 
@@ -55,6 +55,6 @@ class CalendarWidget(MDWidget):
             date_dialog.min_year = 2000
             date_dialog.max_year = today.year +1
             
-            date_dialog.bind(on_ok= lambda date_picker: self.on_ok(date_picker, field, topic_field, text_input))
-            date_dialog.bind(on_cancel=self.on_cancel)
+            date_dialog.bind(on_ok= lambda date_picker: self._on_ok(date_picker, field, topic_field, text_input))
+            date_dialog.bind(on_cancel=self._on_cancel)
             date_dialog.open()

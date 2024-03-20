@@ -18,6 +18,7 @@ class DataReader:
             raise Exception(f"File {self.notes_file_path} not found.")
         except json.JSONDecodeError:
             raise Exception("Error decoding JSON from the file.")
+        
 class DataSender:
     def __init__(self):
         self.notes_file_path = 'app\\assets\\data\\notes.json'

@@ -12,9 +12,10 @@ from kivymd.uix.label import MDLabel
 from kivy.core.window import Window
 from kivy.clock import Clock
 from music21 import pitch
-from mido import MidiFile, MidiTrack, Message, open_input
+from mido import MidiFile, MidiTrack, Message
 import time
 from datetime import datetime
+from core import MidiHandler
 class SheetsScreen(MDScreen):
     def __init__(self, **kwargs):
         super(SheetsScreen, self).__init__(**kwargs)
@@ -24,11 +25,12 @@ class SheetsScreen(MDScreen):
         self.recording = False
         self.theme_cls.primary_palette = "Olive"
         self.md_bg_color = self.theme_cls.backgroundColor
+        
         anchor_layout = MDAnchorLayout(anchor_x='center', anchor_y='bottom')
         box_anchor_layout = MDAnchorLayout(anchor_x='center', anchor_y='center')
         record_layout = MDAnchorLayout(anchor_x='center', anchor_y='top')
-
-        box = MDBoxLayout(orientation='horizontal', spacing=5, padding=1,size_hint=(1, 0.2))
+        midi_handler = MidiHandler()
+        self.box = MDBoxLayout(orientation='horizontal', spacing=5, padding=1,size_hint=(1, 0.2))
         record_box = MDBoxLayout(orientation='horizontal', spacing=5, padding=5,size_hint=(0.5, 0.1))
 
         back_btn = MDButton(MDButtonText(text="Menu"), 
@@ -40,13 +42,13 @@ class SheetsScreen(MDScreen):
         self.connect_btn = MDButton(MDButtonText(text="Connect"), 
                      size_hint=(None, None), size=(100, 50))
         self.connection_message = MDLabel(text="", halign="center")
-       
+        
 
        
-        self.create_notes(box)
+        self.create_notes()
         back_btn.bind(on_press=self.back_to_menu)
-        self.record_btn.bind(on_press=lambda *args: self.toggle_recording())
-        self.connect_btn.bind(on_press=lambda *args: self.connect_device())
+        self.record_btn.bind(on_press=lambda *args: midi_handler.toggle_recording())
+        self.connect_btn.bind(on_press=lambda *args: midi_handler.connect_device(self.connection_message))
         #stop_btn.bind(on_press=self.back_to_menu)
         record_box.add_widget(self.connect_btn)
         record_box.add_widget(self.record_btn)
@@ -54,11 +56,13 @@ class SheetsScreen(MDScreen):
         record_box.add_widget(self.connection_message)
         record_layout.add_widget(record_box)
         anchor_layout.add_widget(back_btn)
-        box_anchor_layout.add_widget(box)
+        box_anchor_layout.add_widget(self.box)
         self.add_widget(anchor_layout)
         self.add_widget(record_layout)
         self.add_widget(box_anchor_layout)
 
+    def __add_widgets__(self):
+        pass
     def connect_device(self):
         for input in mido.get_input_names():
             if "Digital Piano" in input:
@@ -70,14 +74,34 @@ class SheetsScreen(MDScreen):
                 return input
         self.connection_message.text = "Connection Failed"
 
-    def create_notes(self,box):
+    def create_notes(self):
          for note in range(48, 72):  # MIDI notes from C3 to B4
             note_name = self.get_note_name(note)
-            button = MDButton(MDButtonText(text=note_name), pos_hint={"center_x": .5}, height="100px",width="5px",md_bg_color=self.theme_cls.surfaceColor)
+            button = MDButton(MDButtonText(text=note_name), 
+                              pos_hint={"center_x": .5}, 
+                              height="100px",
+                              width="5px",
+                              md_bg_color=self.theme_cls.surfaceColor
+                              )
             if note % 2 == 0:
                 button.md_bg_color = (1,1,1,1)
             self.note_buttons[note] = button
-            box.add_widget(button)
+            self.box.add_widget(button)
+    def get_note_name(self, midi_note):
+        note_names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+        octave = (midi_note // 12) - 1
+        note_index = midi_note % 12
+        return note_names[note_index] + str(octave)
+
+    def highlight_note(self,note, action, velocity):
+        if note in self.note_buttons:
+            button = self.note_buttons[note]
+            if velocity == 64:
+                button.md_bg_color = (1,0,0,1) # Red
+                button.style = "filled"
+            else:
+                button.md_bg_color = (0.1,0,0,1)
+                button.style = "elevated"
     def toggle_recording(self):
         if self.recording:
             self.stop_recording()
@@ -159,21 +183,7 @@ class SheetsScreen(MDScreen):
         # Optionally, save the recorded messages to a MIDI file
 
 
-    def get_note_name(self, midi_note):
-        note_names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-        octave = (midi_note // 12) - 1
-        note_index = midi_note % 12
-        return note_names[note_index] + str(octave)
-
-    def highlight_note(self,note, action, velocity):
-        if note in self.note_buttons:
-            button = self.note_buttons[note]
-            if velocity == 64:
-                button.md_bg_color = (1,0,0,1) # Red
-                button.style = "filled"
-            else:
-                button.md_bg_color = (0.1,0,0,1)
-                button.style = "elevated"
+   
 
  #   def handle_midi_message(self,message):
   #      if message.type in ['note_on', 'note_off']:

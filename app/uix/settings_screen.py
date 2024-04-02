@@ -17,3 +17,5 @@ class SettingsScreen(MDScreen):
 
     def back_to_menu(self, *args):
         self.manager.current = 'main'
+        if self.manager.has_screen('settings'):
+            self.manager.remove_widget(self.manager.get_screen('settings'))

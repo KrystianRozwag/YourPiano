@@ -109,8 +109,9 @@ class CalendarScreen(MDScreen):
         path_label.text = filename[-1]
 
     def _back_to_menu(self, value):
-#        date_dialog.dismiss()
         self.manager.current = 'main'
+        if self.manager.has_screen('calendar'):
+            self.manager.remove_widget(self.manager.get_screen('calendar'))
 
 
 

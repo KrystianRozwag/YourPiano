@@ -1,4 +1,4 @@
-from mido import MidiFile, MidiTrack, Message, open_input
+from mido import MidiFile, MidiTrack
 import time
 from datetime import datetime
 import mido

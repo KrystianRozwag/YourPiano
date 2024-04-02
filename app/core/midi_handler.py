@@ -4,30 +4,31 @@ from datetime import datetime
 import mido
 import threading
 class MidiHandler:
-    def __init__(self):
+    def __init__(self, note_buttons):
         self.recording = False
         self.inport = ""
-    def connect_device(self, connect_message):
+        self.note_buttons = note_buttons
+    def connect_device(self, connect_message, record_btn):
         for input in mido.get_input_names():
             if "Digital Piano" in input:
                 self.inport = mido.open_input(input)
                 connect_message.text = "Connection Success to " + str(self.inport)
-               # self.listener_thread = threading.Thread(target=self.midi_listener, daemon=True)
-                #self.listener_thread.start()
-                self.record_btn.disabled = False
+                self.listener_thread = threading.Thread(target=self.midi_listener, daemon=True)
+                self.listener_thread.start()
+                record_btn.disabled = False
                 return input
         connect_message.text = "Connection Failed"
 
 
-    def toggle_recording(self):
+    def toggle_recording(self, record_btn):
         if self.recording:
             self.stop_recording()
             now = datetime.now()
-            dt_string =  now.strftime("%d-%m-%Y %H-%M-%S") + "midi.mid"
+            dt_string =  now.strftime("%d-%m-%Y %H-%M-%S") + " - midi.mid"
             self.save_midi(dt_string)
-            self.record_btn.text = "Start Recording"
+            record_btn.text = "Start Recording"
         else:
-            self.record_btn.text="Stop Recording"
+            record_btn.text="Stop Recording"
             self.start_recording(self.inport)
 
 
@@ -96,5 +97,22 @@ class MidiHandler:
             except KeyboardInterrupt:
                 print("Recording stopped.")
             self.save_midi(recorded_messages)
+    def midi_listener(self):
+        for message in self.inport:
+                print(message)
+                self.handle_midi_message(message)
 
-        # Optionally, save the recorded messages to a MIDI file
+                
+    def handle_midi_message(self,message):
+        if message.type in ['note_on', 'note_off']:
+           self.highlight_note(message.note, message.type, message.velocity)
+
+    def highlight_note(self,note, action, velocity):
+        if note in self.note_buttons:
+            button = self.note_buttons[note]
+            if velocity == 64:
+                button.md_bg_color = (1,0,0,1) # Red
+                button.style = "filled"
+            else:
+                button.md_bg_color = (0.1,0,0,1)
+                button.style = "elevated"

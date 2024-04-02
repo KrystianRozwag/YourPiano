@@ -29,7 +29,7 @@ class SheetsScreen(MDScreen):
         anchor_layout = MDAnchorLayout(anchor_x='center', anchor_y='bottom')
         box_anchor_layout = MDAnchorLayout(anchor_x='center', anchor_y='center')
         record_layout = MDAnchorLayout(anchor_x='center', anchor_y='top')
-        midi_handler = MidiHandler()
+
         self.box = MDBoxLayout(orientation='horizontal', spacing=5, padding=1,size_hint=(1, 0.2))
         record_box = MDBoxLayout(orientation='horizontal', spacing=5, padding=5,size_hint=(0.5, 0.1))
 
@@ -46,9 +46,10 @@ class SheetsScreen(MDScreen):
 
        
         self.create_notes()
+        midi_handler = MidiHandler(self.note_buttons)
         back_btn.bind(on_press=self.back_to_menu)
-        self.record_btn.bind(on_press=lambda *args: midi_handler.toggle_recording())
-        self.connect_btn.bind(on_press=lambda *args: midi_handler.connect_device(self.connection_message))
+        self.record_btn.bind(on_press=lambda *args: midi_handler.toggle_recording(self.record_btn))
+        self.connect_btn.bind(on_press=lambda *args: midi_handler.connect_device(self.connection_message, self.record_btn))
         #stop_btn.bind(on_press=self.back_to_menu)
         record_box.add_widget(self.connect_btn)
         record_box.add_widget(self.record_btn)
@@ -63,17 +64,7 @@ class SheetsScreen(MDScreen):
 
     def __add_widgets__(self):
         pass
-    def connect_device(self):
-        for input in mido.get_input_names():
-            if "Digital Piano" in input:
-                self.inport = mido.open_input(input)
-                self.connection_message.text = "Connection Success to " + str(self.inport)
-               # self.listener_thread = threading.Thread(target=self.midi_listener, daemon=True)
-                #self.listener_thread.start()
-                self.record_btn.disabled = False
-                return input
-        self.connection_message.text = "Connection Failed"
-
+   
     def create_notes(self):
          for note in range(48, 72):  # MIDI notes from C3 to B4
             note_name = self.get_note_name(note)
@@ -92,108 +83,6 @@ class SheetsScreen(MDScreen):
         octave = (midi_note // 12) - 1
         note_index = midi_note % 12
         return note_names[note_index] + str(octave)
-
-    def highlight_note(self,note, action, velocity):
-        if note in self.note_buttons:
-            button = self.note_buttons[note]
-            if velocity == 64:
-                button.md_bg_color = (1,0,0,1) # Red
-                button.style = "filled"
-            else:
-                button.md_bg_color = (0.1,0,0,1)
-                button.style = "elevated"
-    def toggle_recording(self):
-        if self.recording:
-            self.stop_recording()
-            now = datetime.now()
-            dt_string = "midi.mid" #now.strftime("%d-%m-%Y %H-%M-%S") +
-            self.save_midi(dt_string)
-            self.record_btn.text = "Start Recording"
-        else:
-            self.record_btn.text="Stop Recording"
-            self.start_recording(self.inport)
-
-
-    def start_recording(self, port_name):
-        if not self.recording:
-            self.recording = True
-            self.recorded_messages = []
-            self.start_time = time.time()
-            #self.inport = mido.open_input(port_name)
-            self.thread = threading.Thread(target=self.record)
-            self.thread.start()
-            print("Recording started.")
-
-    def stop_recording(self):
-        if self.recording:
-            self.recording = False
-            #self.thread.join()
-            self.inport.close()
-            print("Recording stopped.")
-
-    def record(self):
-        while self.recording:
-            for msg in self.inport:
-                if msg.is_realtime:
-                    # Skip realtime messages
-                    continue
-                timestamp = time.time() - self.start_time
-                ticks_per_second = 120 / 60 * 480
-                ticks = int(timestamp * ticks_per_second)
-                # Add a time attribute to the message
-                msg.time = ticks
-                self.recorded_messages.append(msg)
-                print(msg)
-
-    def save_midi(self, filename):
-        mid = MidiFile()
-        track = MidiTrack()
-        mid.tracks.append(track)
-        last_tick = 0
-        for msg in self.recorded_messages:
-         #   track.append(mido.second2tick(msg.time, mid.ticks_per_beat,500000))
-            delta_ticks = msg.time - last_tick
-            # Set the message time to the delta time
-            msg.time = delta_ticks
-            track.append(msg)
-            last_tick = msg.time
-
-        mid.save(filename)
-        print(f"Saved to {filename}")
-
-    def record_message(self):
-        if self.inport:
-            print(f"Recording from {self.inport}. Press Ctrl+C to stop.")
-            
-            recorded_messages = []
-            start_time = time.time()
-            
-            try:
-                for msg in self.inport:
-                    # Capture the time since recording started
-                    timestamp = time.time() - start_time
-                    # Add a time attribute to the message
-                    msg.time = timestamp
-                    recorded_messages.append(msg)
-                    print(msg)
-            except KeyboardInterrupt:
-                print("Recording stopped.")
-            self.save_midi(recorded_messages)
-
-        # Optionally, save the recorded messages to a MIDI file
-
-
-   
-
- #   def handle_midi_message(self,message):
-  #      if message.type in ['note_on', 'note_off']:
-   #         self.highlight_note(message.note, message.type, message.velocity)
-
-    def midi_listener(self):
-        for message in self.inport:
-                print(message)
-                self.handle_midi_message(message)
-            
 
     def back_to_menu(self, *args):
         self.manager.current = 'main'

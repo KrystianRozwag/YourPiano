@@ -7,20 +7,22 @@ class DataReader:
         data = self._read_notes()
         notes = data['notes']
         db = DatabaseLoader()
-        db.connect()
-        row = db.read_data_from_db(date)
-        if(row):
-            topic_field.text = row[0]
-            text_input.text = row[1]
-            print(row)
-        #for note in notes:
-         #   if note['date'] == date:
-          #      topic_field.text = note['title']
-           #     text_input.text = note['description']
+        is_connected = db.connect()
+        if(is_connected):
+            row = db.read_data_from_db(date)
+            if(row):
+                topic_field.text = row[0]
+                text_input.text = row[1]
+                print(row)
+        else:
+            for note in notes:
+                if note['date'] == date:
+                    topic_field.text = note['title']
+                    text_input.text = note['description']
         
     def _read_notes(self):
         try:
-            with open(self.notes_file_path, 'r') as json_file:
+            with open(self.notes_file_path, 'r') as json_file: #create file if not found
                 return json.load(json_file)
         except FileNotFoundError:
             raise Exception(f"File {self.notes_file_path} not found.")
@@ -35,16 +37,19 @@ class DataSender:
         data = self._read_notes()
         notes = data['notes']
         db = DatabaseLoader()
-        db.connect()
-        row = db.read_data_from_db(calendar.text)
-        if(row):
-            note_found = self._update_existing_note_if_present(notes, calendar.text, topic.text, description.text) #update code to update data in the db
-            db.update_data_in_db(topic.text, description.text, file_path, calendar.text)
-        else:
-            db.send_data_to_db(topic.text, description.text,calendar.text,file_path)
-            note_found = False
+        is_connected = db.connect()
+        if(is_connected):
 
-        db.disconnect()
+            row = db.read_data_from_db(calendar.text)
+            if(row):
+                #note_found = self._update_existing_note_if_present(notes, calendar.text, topic.text, description.text) #update code to update data in the db
+                note_found = True
+                db.update_data_in_db(topic.text, description.text, file_path, calendar.text)
+            else:
+                db.send_data_to_db(topic.text, description.text,calendar.text,file_path)
+                note_found = False
+
+            db.disconnect()
 
 
         #note_found = self._update_existing_note_if_present(notes, calendar.text, topic.text, description.text)

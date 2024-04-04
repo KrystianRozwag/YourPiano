@@ -8,7 +8,7 @@ class ScreensManager(MDScreenManager):
 class PianoDiaryApp(MDApp):
     def build(self):
         sm = ScreensManager()
-        sm.add_widget(MainScreen(name='main'))
+        sm.add_widget(MainScreen(name='main')) 
         return sm
         
 

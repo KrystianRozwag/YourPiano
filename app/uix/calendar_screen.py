@@ -16,7 +16,7 @@ class CalendarScreen(MDScreen):
     def __init__(self, **kwargs):
         super(CalendarScreen, self).__init__(**kwargs)
         self.file_path = ''
-        self.theme_cls.primary_palette = "Olive"
+        #self.theme_cls.primary_palette = "Olive"
         self.md_bg_color = self.theme_cls.backgroundColor
         self.current_date = datetime.now().strftime('%d/%m/%Y')
         self.size_hint = (1,1)
@@ -57,7 +57,9 @@ class CalendarScreen(MDScreen):
         load_file_btn = MDButton(MDButtonText(text="Send day"), 
             size_hint=(None, None), 
             size=(100, 50),
-            pos_hint={'center_x': 0.5, 'center_y': 0.5}
+            pos_hint={'center_x': 0.5, 'center_y': 0.5},
+            theme_bg_color = "Custom",
+            md_bg_color = "red"
         )
         path_label = MDLabel(text="", halign="center")
 

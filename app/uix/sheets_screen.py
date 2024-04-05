@@ -72,10 +72,11 @@ class SheetsScreen(MDScreen):
                               pos_hint={"center_x": .5}, 
                               height="100px",
                               width="5px",
-                              md_bg_color=self.theme_cls.surfaceColor
+                              theme_bg_color = "Custom", 
+                              md_bg_color="white"
                               )
             if note % 2 == 0:
-                button.md_bg_color = (1,1,1,1)
+                button.md_bg_color = "black"
             self.note_buttons[note] = button
             self.box.add_widget(button)
     def get_note_name(self, midi_note):

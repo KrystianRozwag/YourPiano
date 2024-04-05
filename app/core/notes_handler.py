@@ -33,7 +33,7 @@ class DataSender:
     def __init__(self):
         self.notes_file_path = 'app\\assets\\data\\notes.json'
 
-    def send_data(self, calendar, topic, description, file_path): #maybe here to put sending data to the server
+    def send_data(self, calendar, topic, description, file_path):
         data = self._read_notes()
         notes = data['notes']
         db = DatabaseLoader()
@@ -50,8 +50,6 @@ class DataSender:
                 note_found = False
 
             db.disconnect()
-
-
         #note_found = self._update_existing_note_if_present(notes, calendar.text, topic.text, description.text)
         
         if not note_found:

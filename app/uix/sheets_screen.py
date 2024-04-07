@@ -24,7 +24,7 @@ class SheetsScreen(MDScreen):
         back_btn = MDButton(MDButtonText(text="Menu"), 
                      size_hint=(None, None), size=(100, 50))
         self.record_btn = MDButton(MDButtonText(text="Record"), 
-                     size_hint=(None, None), size=(100, 50))
+                     size_hint=(None, None), size=(100, 50), disabled=True)
         #stop_btn = MDButton(MDButtonText(text="Stop"), 
          #            size_hint=(None, None), size=(100, 50))
         self.connect_btn = MDButton(MDButtonText(text="Connect"), 

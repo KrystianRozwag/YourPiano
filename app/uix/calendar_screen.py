@@ -54,12 +54,11 @@ class CalendarScreen(MDScreen):
             size=(100, 50),
 
         )
-        load_file_btn = MDButton(MDButtonText(text="Send day"), 
+        self.send_file_btn = MDButton(MDButtonText(text="Send day"), 
             size_hint=(None, None), 
             size=(100, 50),
             pos_hint={'center_x': 0.5, 'center_y': 0.5},
-            theme_bg_color = "Custom",
-            md_bg_color = "red"
+            disabled = True
         )
         path_label = MDLabel(text="", halign="center")
 
@@ -82,12 +81,13 @@ class CalendarScreen(MDScreen):
         self.add_widget(calendar_widget)
         back_btn.bind(on_press=self._back_to_menu)
         data_sender = DataSender()
-        load_file_btn.bind(on_press=lambda *args: data_sender.send_data(self.calendar_field, topic_field, text_input, self.file_path) )
+        
+        self.send_file_btn.bind(on_press=lambda *args: data_sender.send_data(self.calendar_field, topic_field, text_input, self.file_path) )
         choose_file_btn.bind(on_release=lambda *args: self._load_file(path_label))
-
+        topic_field.bind(set_text=lambda *args: self._block_send_btn())
         scroll_view.add_widget(text_input)
         layout.add_widget(self.calendar_field)
-        widgets = [topic_field,scroll_view,choose_file_btn,path_label,load_file_btn]
+        widgets = [topic_field,scroll_view,choose_file_btn,path_label,self.send_file_btn]
         for widget in widgets:
             layout.add_widget(widget)
 
@@ -99,7 +99,12 @@ class CalendarScreen(MDScreen):
         self.add_widget(anchor_layout_btns)
 
 
-
+    def _block_send_btn(self):
+        if self.topic_field.text != "":
+            self.send_file_btn.disabled = False
+        else:
+            self.send_file_btn.disabled = True
+            
     def _load_file(self, path_label):
         file_types = [
     ('MP3 files', '*.mp3'),

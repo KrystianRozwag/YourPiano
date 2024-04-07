@@ -1,4 +1,5 @@
 from mido import MidiFile, MidiTrack
+from kivymd.uix.button import MDButtonText
 import time
 from datetime import datetime
 import mido
@@ -26,9 +27,9 @@ class MidiHandler:
             now = datetime.now()
             dt_string =  now.strftime("%d-%m-%Y %H-%M-%S") + " - midi.mid"
             self.save_midi(dt_string)
-            record_btn.text = "Start Recording"
+            record_btn.add_widget(MDButtonText(text="Start Recording"))
         else:
-            record_btn.text="Stop Recording"
+            record_btn.add_widget(MDButtonText(text="Stop Recording"))
             self.start_recording(self.inport)
 
 

@@ -110,9 +110,18 @@ class MidiHandler:
     def highlight_note(self,note, action, velocity):
         if note in self.note_buttons:
             button = self.note_buttons[note]
-            if velocity == 64:
-                button.md_bg_color = (1,0,0,1) # Red
-                button.style = "filled"
-            else:
-                button.md_bg_color = (0.1,0,0,1)
-                button.style = "elevated"
+            if note % 2 != 0:
+                if velocity == 64:
+                    button.md_bg_color = (0.1,0.1,0.1,1) # Red
+                    #button.style = "filled"
+                else:
+                    button.md_bg_color = (0,0,0,1) # Red
+                    #button.style = "filled"
+
+            elif note % 2 == 0:
+                if velocity == 64:
+
+                    button.md_bg_color = (0.9,0.9,0.9,1)
+                    #button.style = "elevated"
+                else:
+                    button.md_bg_color = (1,1,1,1)

@@ -1,20 +1,8 @@
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.floatlayout import MDFloatLayout
-from kivymd.uix.button import MDButton, MDButtonIcon, MDButtonText,BaseButton
+from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.screen import MDScreen
-from kivymd.app import MDApp
 from kivymd.uix.anchorlayout import MDAnchorLayout
-from kivymd.uix.screenmanager import MDScreenManager
-import mido
-import threading
 from kivymd.uix.label import MDLabel 
-#from kivymd.uix.button import MDRectangleFlatButton
-from kivy.core.window import Window
-from kivy.clock import Clock
-from music21 import pitch
-from mido import MidiFile, MidiTrack, Message
-import time
-from datetime import datetime
 from core import MidiHandler
 class SheetsScreen(MDScreen):
     def __init__(self, **kwargs):
@@ -68,15 +56,18 @@ class SheetsScreen(MDScreen):
     def create_notes(self):
          for note in range(48, 72):  # MIDI notes from C3 to B4
             note_name = self.get_note_name(note)
-            button = MDButton(MDButtonText(text=note_name), 
+            button = MDButton(
+                #MDButtonText(text=note_name), 
                               pos_hint={"center_x": .5}, 
                               height="100px",
-                              width="5px",
+                              width="40px",
                               theme_bg_color = "Custom", 
-                              md_bg_color="white"
+                              md_bg_color="white",
+                              radius = [5,5,5,5]
                               )
-            if note % 2 == 0:
-                button.md_bg_color = "black"
+            if note % 2 != 0:
+                button.md_bg_color = (0,0,0,1)
+                button.width="20px"
             self.note_buttons[note] = button
             self.box.add_widget(button)
     def get_note_name(self, midi_note):

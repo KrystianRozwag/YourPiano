@@ -1,25 +1,60 @@
 from mido import MidiFile, MidiTrack
-from kivymd.uix.button import MDButtonText
+from kivymd.uix.button import MDButton, MDButtonText
+from kivymd.uix.selectioncontrol import MDCheckbox
+from kivymd.uix.label import MDLabel
 import time
 from datetime import datetime
 import mido
 import threading
+
+class ValueCheckbox(MDCheckbox):
+    def __init__(self, value=None, **kwargs):
+        super().__init__(**kwargs)
+        self.value = value
+
 class MidiHandler:
-    def __init__(self, note_buttons):
+    def __init__(self, note_buttons, record_btn_txt):
         self.recording = False
         self.inport = ""
         self.note_buttons = note_buttons
-    def connect_device(self, connect_message, record_btn):
+        self.selected_port = ""
+        self.record_btn_txt = record_btn_txt
+
+    def find_device(self, connect_message, record_btn, record_box):
+        input_devices = mido.get_input_names()
+        if(len(input_devices)==0):
+            connect_message.text = "No devices connected"
+            return 0
+        
         for input in mido.get_input_names():
-            if "Digital Piano" in input:
+            ''' if "Digital Piano" in input:
                 self.inport = mido.open_input(input)
                 connect_message.text = "Connection Success to " + str(self.inport)
                 self.listener_thread = threading.Thread(target=self.midi_listener, daemon=True)
                 self.listener_thread.start()
                 record_btn.disabled = False
-                return input
-        connect_message.text = "Connection Failed"
+                return input'''
+            checkbox = ValueCheckbox(group="connections", value = input)
+            checkbox.bind(on_touch_down=lambda *args: self._assign_port(checkbox.value))
+            record_box.add_widget(checkbox)
+            status_label = MDLabel(text=input)
+            record_box.add_widget(status_label)
+        
+        connect_btn = MDButton(MDButtonText(text="Connect"), 
+                     size_hint=(None, None), size=(100, 50))
+        connect_btn.bind(on_press=lambda *args: self._connect_device(connect_message, record_btn))
+        record_box.add_widget(connect_btn)
 
+    def _connect_device(self, connect_message, record_btn):
+                self.inport = mido.open_input(self.selected_port)
+                connect_message.text = "Connection Success to " + str(self.inport)
+                self.listener_thread = threading.Thread(target=self.midi_listener, daemon=True)
+                self.listener_thread.start()
+                record_btn.disabled = False
+                return input
+
+    def _assign_port(self, checkbox_value):
+        self.selected_port = checkbox_value
 
     def toggle_recording(self, record_btn):
         if self.recording:
@@ -27,9 +62,14 @@ class MidiHandler:
             now = datetime.now()
             dt_string =  now.strftime("%d-%m-%Y %H-%M-%S") + " - midi.mid"
             self.save_midi(dt_string)
-            record_btn.add_widget(MDButtonText(text="Start Recording"))
+            record_btn.remove_widget(self.record_btn_txt)
+            self.record_btn_txt = MDButtonText(text="Start Recording")
+            record_btn.add_widget(self.record_btn_txt)
+
         else:
-            record_btn.add_widget(MDButtonText(text="Stop Recording"))
+            record_btn.remove_widget(self.record_btn_txt)
+            self.record_btn_txt = MDButtonText(text="Stop Recording")
+            record_btn.add_widget(self.record_btn_txt)
             self.start_recording(self.inport)
 
 
@@ -98,6 +138,7 @@ class MidiHandler:
             except KeyboardInterrupt:
                 print("Recording stopped.")
             self.save_midi(recorded_messages)
+
     def midi_listener(self):
         for message in self.inport:
                 print(message)
@@ -108,18 +149,25 @@ class MidiHandler:
         if message.type in ['note_on', 'note_off']:
            self.highlight_note(message.note, message.type, message.velocity)
 
+    def get_note_name(self, midi_note):
+        note_names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+        octave = (midi_note // 12) - 1
+        note_index = midi_note % 12
+        return note_names[note_index] + str(octave)
+    
     def highlight_note(self,note, action, velocity):
         if note in self.note_buttons:
             button = self.note_buttons[note]
-            if note % 2 != 0:
+            note_name = self.get_note_name(note)
+            if "#" in note_name:
                 if velocity == 64:
-                    button.md_bg_color = (0.1,0.1,0.1,1) # Red
+                    button.md_bg_color = (0.25,0.25,0.25,1) # Red
                     #button.style = "filled"
                 else:
                     button.md_bg_color = (0,0,0,1) # Red
                     #button.style = "filled"
 
-            elif note % 2 == 0:
+            else:
                 if velocity == 64:
 
                     button.md_bg_color = (0.9,0.9,0.9,1)

@@ -12,7 +12,7 @@ class CalendarWidget(MDWidget):
         self.size_hint = (1, 1)
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         self.current_date = datetime.now().strftime('%d/%m/%Y')
-       
+        self.date_dialog = ""
         field.add_widget(MDTextFieldHintText(text=self.current_date))
         field.bind(focus= lambda passed_field,focus: self.show_date_picker(passed_field, focus, topic_field, text_input))
 
@@ -31,30 +31,36 @@ class CalendarWidget(MDWidget):
         text_field = MDTextFieldHintText(text=new_date)
         field.text = new_date
         field.add_widget(text_field)
-        field.focus = True
+        #field.focus = True
         data_reader = DataReader()
         data_reader.load_data(topic_field, text_input,new_date)
+        self.number_of_docked_dates -= 1
         instance_date_picker.dismiss()
         field.focus = False
-        self.number_of_docked_dates -= 1
+
 
 
 
     def _on_cancel(self, instance_date_picker):
         instance_date_picker.dismiss()
         self.number_of_docked_dates -= 1
+    def _decrease_num_of_date_dialogs(self):
+        if self.number_of_docked_dates > 0:
+            self.number_of_docked_dates -= 1
 
     def show_date_picker(self, field, focus, topic_field, text_input):
-        if not focus:
+        if not focus and self.date_dialog.is_open == False:
+            self.number_of_docked_dates = 0
             return
         if self.number_of_docked_dates == 0:
 
             self.number_of_docked_dates += 1
             today = date.today()
-            date_dialog = MDDockedDatePicker(year=today.year, month = today.month, day=today.day)
-            date_dialog.min_year = 2000
-            date_dialog.max_year = today.year +1
+            self.date_dialog = MDDockedDatePicker(year=today.year, month = today.month, day=today.day)
+            self.date_dialog.min_year = 2000
+            self.date_dialog.max_year = today.year +1
             
-            date_dialog.bind(on_ok= lambda date_picker: self._on_ok(date_picker, field, topic_field, text_input))
-            date_dialog.bind(on_cancel=self._on_cancel)
-            date_dialog.open()
+            self.date_dialog.bind(on_ok= lambda date_picker: self._on_ok(date_picker, field, topic_field, text_input))
+            self.date_dialog.bind(on_cancel=self._on_cancel)
+            self.date_dialog.bind(on_dismiss=lambda *args:self._decrease_num_of_date_dialogs)
+            self.date_dialog.open()

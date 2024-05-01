@@ -44,10 +44,10 @@ class DatabaseLoader:
         try:
             self.cur.execute(f"UPDATE diaries set topic = '{topic}', description = '{description}', path = '{path}' where date = '{date}';")
             self.conn.commit()
-            self.cur.execute(f"UPDATE diaries set topic = '{topic}', description = '{description}', path = '{path}' where date = '{date}';")
-            self.conn.commit()
+           # self.cur.execute(f"UPDATE diaries set topic = '{topic}', description = '{description}', path = '{path}' where date = '{date}';")
+            #self.conn.commit()
         except Exception as e:
-            print(f"Could not update data to the database: {e}")
+            print(f"Could not update data in the database: {e}")
     def disconnect(self):
         self.cur.close()
         self.conn.close()
